@@ -23,7 +23,7 @@ VOID* _Out_
 IbpAllocateScratch(
 	UINTN Size
 ) {
-	// allocate on 64-bit aligned sizes. last thing we need is an unaligned allocation
+	// allocate on 8-bit aligned sizes. last thing we need is an unaligned allocation
 	ASSERT((Size & 0b111) != 0);
 	ASSERT((UINT64)gIbScratchCursor + Size < gIbScratchHeapLimit);	
 	

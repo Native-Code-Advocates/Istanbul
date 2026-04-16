@@ -1,0 +1,28 @@
+cc = clang
+nasm = nasm
+nflags = -Werror -g -f win64
+cflags = -Werror -Wall -Wextra -Wshadow -Wconversion -Wnull-dereference -Wparentheses -Wunreachable-code -Wtautological-compare -Wno-unused-command-line-argument
+lflags = -Wl,/entry:IbUefiMain -Wl,/subsystem:EFI_BOOT_SERVICE_DRIVER
+
+rule compile
+  command = $cc $cflags -MMD -MF $out.d -c $in -o $out
+  description = Compiling $in...
+  depfile = $out.d
+  deps = gcc
+rule assemble
+  command = $nasm $nflags $in -o $out
+  description = Assembling $in
+rule link
+  command = $cc $in -o $out $lflags
+  description = Linking $in...
+
+build build/obj/Main.o: compile src/Main.c
+build build/obj/Utils.o: compile src/Uefi/Utils.c
+build build/obj/Mem.o: compile src/Uefi/Mem.c
+build build/obj/Pci.o: compile src/Arch/Pci.c
+build build/obj/Pci2.o: assemble src/Arch/x86/Paravirt/Pci.asm
+build build/obj/Interlocked.o: assemble src/Arch/x86/Interlocked.asm
+build build/obj/Cpu.o: assemble src/Arch/x86/Cpu.asm
+build build/obj/Hypervisor.o: assemble src/Arch/x86/Paravirt/Hypervisor.asm
+build build/obj/Variables.o: assemble src/Arch/x86/Paravirt/Variables.asm
+build build/Istanbul.efi: link build/obj/Hypervisor.o build/obj/Pci.o build/obj/Pci2.o build/obj/Variables.o build/obj/Interlocked.o build/obj/Cpu.o build/obj/Main.o build/obj/Utils.o build/obj/Mem.o

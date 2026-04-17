@@ -3,26 +3,12 @@
 #include "Utils.h"
 #include "../Istanbul.h"
 
-#define ISTANBUL_HEAP_BEGIN 0x3000
-#define ISTANBUL_HEAP_MAX 0x50000
-
-#define ISTANBUL_SCRATCH_BEGIN 0x1000
-#define ISTANBUL_SCRATCH_END 0x3000
-
 #define MEMORY_INTERSECT(s1, e1, s2, e2) \
 	((s1 <= e2) && (s2 <= e1))	
 
 typedef struct {
-	LIST_ENTRY Link;
-	BOOLEAN FromPages;
-
-	EFI_MEMORY_TYPE Type;
-	UINT64 Start;
-	UINT64 End;
-
-	UINT64 VirtualStart;
-	UINT64 Attribute;
-} ISTANBUL_MEMORY_MAP; 
+	UINT8 MemoryType;
+} _Packed_ ISTANBUL_PAGE_ALLOCATION;
 
 VOID
 IbpMemInitialize(

@@ -8,6 +8,7 @@ typedef struct {
 	VOID* PcieSpace;
 	UINTN PcieSize;
 	UINTN MemorySize;
+	VOID* MemoryBitmap;
 	UINTN LogicalProcessorCount;
 } ISTANBUL_BOOT_DATA;
 

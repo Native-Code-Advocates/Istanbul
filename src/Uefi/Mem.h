@@ -6,9 +6,18 @@
 #define MEMORY_INTERSECT(s1, e1, s2, e2) \
 	((s1 <= e2) && (s2 <= e1))	
 
+#define MAX_ADDR (~0ULL)
+#define MIN_ADDR (0)
+
 typedef struct {
 	UINT8 MemoryType;
 } _Packed_ ISTANBUL_PAGE_ALLOCATION;
+
+typedef struct {
+	LIST_ENTRY Link;
+	EFI_PHYSICAL_ADDRESS Start;
+	UINTN NumberOfBytes;
+} ISTANBUL_POOL_ALLOCATION;
 
 VOID
 IbpMemInitialize(

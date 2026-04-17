@@ -49,3 +49,12 @@ EFI_STATUS
 IbUefiFreePool(
 	VOID* _In_ Buffer
 );
+
+EFI_STATUS
+IbUefiGetMemoryMap(
+	UINTN* _Out_ MemoryMapSize,
+	EFI_MEMORY_DESCRIPTOR* _Out_opt_ MemoryMap,
+	UINTN* _Out_ MapKey,
+	UINTN* _Out_ DescriptorSize,
+	UINT32* _Out_ DescriptorVersion
+);

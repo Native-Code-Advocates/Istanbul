@@ -6,6 +6,7 @@
 ISTANBUL_PAGE_ALLOCATION* MemoryBitmap;
 UINT64 MemorySize;
 LIST_ENTRY PoolAllocations;
+UINTN MemoryMapKey;
 
 VOID
 IbpMemInitialize(
@@ -55,6 +56,8 @@ IbAllocatePages(
 		Allocation[i].MemoryType = (UINT8)Type;
 	}
 
+	MemoryMapKey++;
+
 	return Allocation;
 }
 
@@ -68,6 +71,8 @@ IbFreePages(
 	for (UINTN i = 0; i < NumberOfPages; i++){
 		Allocation[i].MemoryType = (UINT8)EfiConventionalMemory;
 	}
+
+	MemoryMapKey++;
 }
 
 EFI_STATUS
@@ -150,5 +155,57 @@ IbUefiAllocatePages(
 	}
 
 	*Memory = Allocation;
+	return EFI_SUCCESS;
+}
+
+EFI_STATUS
+IbUefiGetMemoryMap(
+	UINTN* _Out_ MemoryMapSize,
+	EFI_MEMORY_DESCRIPTOR* _Out_opt_ MemoryMap,
+	UINTN* _Out_ MapKey,
+	UINTN* _Out_ DescriptorSize,
+	UINT32* _Out_ DescriptorVersion
+) {
+	*DescriptorVersion = 1;
+	*DescriptorSize = sizeof(EFI_MEMORY_DESCRIPTOR);
+	*MapKey = MemoryMapKey;
+
+	UINTN DescriptorCount = 0;
+	EFI_PHYSICAL_ADDRESS CurrentBase = 0;
+
+	UINT64 TotalPages = (MemorySize >> 12);
+	for(UINTN i = 0; i < TotalPages; i++) {
+		UINT8 Type = MemoryBitmap[i].MemoryType;
+
+    	while (i < TotalPages && MemoryBitmap[i].MemoryType == Type) {
+        	i++;
+    	}
+
+		DescriptorCount++;
+	}
+
+	if (*MemoryMapSize < (*DescriptorSize * DescriptorCount)) {
+		*MemoryMapSize = DescriptorCount * *DescriptorSize;
+		return EFI_BUFFER_TOO_SMALL;
+	}
+
+	*MemoryMapSize = DescriptorCount * *DescriptorSize;
+
+	// double pass
+	for(UINTN i = 0; i < TotalPages; i++) {
+		UINT8 Type = MemoryBitmap[i].MemoryType;
+    	UINTN RunStart = i;
+
+    	while (i < TotalPages && MemoryBitmap[i].MemoryType == Type) {
+        	i++;
+    	}
+
+		MemoryMap[i].Attribute = 0x0000000000000004; // WT
+		MemoryMap[i].NumberOfPages = i - RunStart;
+		MemoryMap[i].PhysicalStart = RunStart << 12;
+		MemoryMap[i].Type = MemoryBitmap[RunStart].MemoryType;
+		MemoryMap[i].VirtualStart = 0;
+	}
+
 	return EFI_SUCCESS;
 }

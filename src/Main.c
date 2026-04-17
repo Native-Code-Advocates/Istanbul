@@ -22,6 +22,7 @@ IbpUefiSetupBootServices(
 	gBootServices.FreePages = IbUefiFreePages;
 	gBootServices.AllocatePool = IbUefiAllocatePool;
 	gBootServices.FreePool = IbUefiFreePool;
+	gBootServices.GetMemoryMap = IbUefiGetMemoryMap;
 
 	return EFI_SUCCESS;
 }
@@ -33,10 +34,10 @@ IbpUefiSetupRuntimeServices(
 ) {
 	_Unused_var_(BootData);
 
-	gSystemTable.RuntimeServices->SetVariable = IbpAsmSetVariable;
-	gSystemTable.RuntimeServices->QueryVariableInfo = IbpAsmQueryVariableInfo;
-	gSystemTable.RuntimeServices->GetVariable = IbpAsmGetVariable;
-	gSystemTable.RuntimeServices->GetNextVariableName = IbpAsmGetNextVariableName;
+	gRuntimeServices.SetVariable = IbpAsmSetVariable;
+	gRuntimeServices.QueryVariableInfo = IbpAsmQueryVariableInfo;
+	gRuntimeServices.GetVariable = IbpAsmGetVariable;
+	gRuntimeServices.GetNextVariableName = IbpAsmGetNextVariableName;
 
 	return EFI_SUCCESS;
 }

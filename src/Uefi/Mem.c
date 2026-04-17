@@ -177,6 +177,7 @@ IbUefiGetMemoryMap(
 	for(UINTN i = 0; i < TotalPages; i++) {
 		UINT8 Type = MemoryBitmap[i].MemoryType;
 
+		// make sure its the same contiguous block
     	while (i < TotalPages && MemoryBitmap[i].MemoryType == Type) {
         	i++;
     	}
